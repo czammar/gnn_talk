@@ -1,0 +1,18 @@
+services:
+  neo4j:
+    image: neo4j:5.12-community
+    container_name: gnn_movie_neo4j
+    ports:
+      - "7474:7474" # Interfaz Web
+      - "7687:7687" # Puerto Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/password123
+      - NEO4J_PLUGINS=["apoc"]
+    volumes:
+      - neo4j_data:/data
+      # Mapeamos tus archivos locales al entorno de importación de Neo4j
+      - ./data:/var/lib/neo4j/import/data
+      - ./init-db.cypher:/var/lib/neo4j/import/init-db.cypher
+
+volumes:
+  neo4j_data:
