@@ -1,12 +1,37 @@
+# COLORS
+GREEN  := $(shell tput -Txterm setaf 2)
+YELLOW := $(shell tput -Txterm setaf 3)
+WHITE  := $(shell tput -Txterm setaf 7)
+RESET  := $(shell tput -Txterm sgr0)
+
+TARGET_MAX_CHAR_NUM=20
+
 # Variables
 UV := $(shell command -v uv 2> /dev/null)
 
-.PHONY: all install sync clean
+.PHONY: all install sync clean help
 
-# Acción por defecto si solo ejecutas `make`
+## Show help with `make help`
+help:
+	@echo ''
+	@echo 'Usage:'
+	@echo '  ${YELLOW}make${RESET} ${GREEN}<target>${RESET}'
+	@echo ''
+	@echo 'Targets:'
+	@awk '/^[a-zA-Z\-\_0-9]+:/ { \
+		helpMessage = match(lastLine, /^## (.*)/); \
+		if (helpMessage) { \
+			helpCommand = substr($$1, 0, index($$1, ":")-1); \
+			helpMessage = substr(lastLine, RSTART + 3, RLENGTH); \
+			printf "  ${YELLOW}%-$(TARGET_MAX_CHAR_NUM)s${RESET} ${GREEN}%s${RESET}\n", helpCommand, helpMessage; \
+		} \
+	} \
+	{ lastLine = $$0 }' $(MAKEFILE_LIST)
+
+## Default action by executing `make` (install uv + sync)
 all: install sync
 
-# 1. Instala uv si no está instalado
+## Installing uv
 install:
 ifdef UV
 	@echo "✅ 'uv' ya está instalado en: $(UV)"
@@ -16,7 +41,7 @@ else
 	@echo "⚠️  Nota: Si es la primera vez que instalas 'uv', es posible que necesites reiniciar tu terminal o recargar tu perfil (source ~/.zshrc o ~/.bashrc)."
 endif
 
-# 2. Ejecuta uv sync para aprovisionar el entorno
+## Syncing project dependencies with uv
 sync:
 	@echo "🔄 Sincronizando dependencias del proyecto con uv..."
 	@if command -v uv > /dev/null; then \
@@ -27,7 +52,7 @@ sync:
 	fi
 	@echo "🚀 Entorno virtual listo y actualizado."
 
-# Extra: Limpiar el entorno virtual por si necesitas recrearlo
+## Cleaning the venv environment
 clean:
 	@echo "🧹 Eliminando el entorno virtual (.venv)..."
 	@rm -rf .venv
