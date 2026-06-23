@@ -9,7 +9,7 @@ TARGET_MAX_CHAR_NUM=20
 # Variables
 UV := $(shell command -v uv 2> /dev/null)
 
-.PHONY: all install sync clean help
+.PHONY: all install sync clean help up down
 
 ## Show help with `make help`
 help:
@@ -57,3 +57,11 @@ clean:
 	@echo "🧹 Eliminando el entorno virtual (.venv)..."
 	@rm -rf .venv
 	@echo "✨ Limpieza completada."
+
+## Deploying Neo4j Server
+up:
+	docker compose up -d
+
+## Stoping Neo4j Server
+down:
+	docker compose down
