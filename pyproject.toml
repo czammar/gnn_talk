@@ -26,6 +26,9 @@ environments = [
     "sys_platform == 'darwin' and platform_machine == 'x86_64'"
 ]
 
+[tool.uv.extra-build-dependencies]
+torch-sparse = ["torch"]
+
 [dependency-groups]
 dev = [
     "ipykernel>=7.3.0",

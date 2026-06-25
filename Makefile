@@ -8,8 +8,19 @@ TARGET_MAX_CHAR_NUM=20
 
 # Variables
 UV := $(shell command -v uv 2> /dev/null)
+PYTHON_VERSION := 3.11.14
 
-.PHONY: all install sync clean help up down
+.PHONY: all check-python-version get-python-version install sync clean help up down 
+
+## Check is python version of the project
+check-python-version:
+	@test "$$(cat .python-version)" = "$(PYTHON_VERSION)" || \
+		(echo ".python-version must be $(PYTHON_VERSION)"; exit 1)
+
+## Download & pin python version for the project
+get-python-version:
+	uv python install $(PYTHON_VERSION)
+	uv python pin $(PYTHON_VERSION)
 
 ## Show help with `make help`
 help:
@@ -42,7 +53,7 @@ else
 endif
 
 ## Syncing project dependencies with uv
-sync:
+sync: get-python-version check-python-version 
 	@echo "🔄 Sincronizando dependencias del proyecto con uv..."
 	@if command -v uv > /dev/null; then \
 		uv sync; \
